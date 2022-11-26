@@ -1,19 +1,11 @@
 import {
-    Controller,
-    Post,
-    Body,
-    Get,
-    Param,
-    Patch,
-    Delete,
+    Body, Controller, Get, Post
 } from '@nestjs/common';
 import { SignInResponse, UsersService } from './users.service';
-import { UserObj } from './users.service';
 
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
-
 
     @Post('/sign-in')
     signIn(@Body('email') email: string, @Body('password') password: string): Promise<SignInResponse> {
@@ -28,7 +20,6 @@ export class UsersController {
     ) {
         return this.usersService.create({ name, email, password })
     }
-
 
     @Get('/get-users')
     getAllUsers() {

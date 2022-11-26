@@ -1,8 +1,19 @@
 import { Column, DataType, Default, Model, PrimaryKey, Table } from 'sequelize-typescript';
-import { v4 as UUIDV4 } from "uuid";
+import * as _ from "lodash";
+
+export enum UserRole {
+    USER = 'user',
+    ADMIN = 'admin',
+}
 
 @Table
 export class User extends Model<User> {
+
+    @PrimaryKey
+    @Column({
+        type: DataType.STRING, defaultValue: Math.floor(Math.random() * 1000000),
+    })
+    id: String;
 
     @Column({
         type: DataType.STRING,
@@ -12,7 +23,6 @@ export class User extends Model<User> {
 
     @Column({
         type: DataType.STRING,
-        unique: true,
         allowNull: false,
 
     })
@@ -24,25 +34,13 @@ export class User extends Model<User> {
     })
     password: string;
 
-
+    @Column({
+        type: DataType.ENUM(UserRole.USER, UserRole.ADMIN)
+    })
+    userRole: UserRole
 
     @Column({
-        type: DataType.TEXT,
-        allowNull: true
+        type: DataType.STRING
     })
     token: string
 }
-
-    // @Column({
-    //     allowNull: true
-    // })
-    // @PrimaryKey
-    // @Default(UUIDV4)
-    // id: string;
-
-    // @Column({
-    //     type: DataType.BOOLEAN,
-    //     allowNull: true
-    // })
-    // @Default(false)
-    // isAdmin: string;

@@ -17,8 +17,8 @@ export interface SignInResponse {
 }
 
 export interface IUser {
+    id: String,
     email: string,
-    userRole: string
 }
 
 export interface ISignUpResponse {
@@ -46,9 +46,9 @@ export class UsersService {
             throw new HttpException('Email already registered!', 400);
 
         const protectedPassword = await this.hashPassword(password);
-        const { token } = await this.getToken({ email, userRole: UserRole.USER });
-
         const response = await this.userRepository.create<User>({ name, email, password: protectedPassword, userRole: UserRole.USER });
+        const { token } = await this.getToken({ id: response?.dataValues?.id, email });
+
         return {
             ...response,
             token
@@ -72,7 +72,7 @@ export class UsersService {
         if (!validPassword) {
             throw new HttpException('Invalid credentials', 400);
         }
-        const { token } = await this.getToken({ email, userRole: UserRole.USER });
+        const { token } = await this.getToken({ id: user?.dataValues?.id, email });
         return {
             token
         }
@@ -91,8 +91,8 @@ export class UsersService {
         return {
             token: await this.jwtService.signAsync(
                 {
+                    id: user.id,
                     sub: user.email,
-                    role: user.userRole,
                 },
                 {
                     secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),

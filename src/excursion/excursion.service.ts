@@ -1,7 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { Sequelize } from "sequelize";
 import { EXCURSION_REPOSITORY } from "src/core/constants";
 import { ExcursionDto } from "./dto/excursion.dto";
 import { Excursion } from "./excursion.modal";
+import { Op } from "sequelize";
 
 @Injectable()
 export class ExcursionService {
@@ -18,8 +20,22 @@ export class ExcursionService {
         return await this.excursionRepository.findAll();
     }
 
-    async filterByCity(city) {
-        return await this.excursionRepository.findAll({ where: city })
+    async filterByCity(city, userPage, recordLimit) {
+        const pagination = await this.getPagination(this.excursionRepository, userPage, recordLimit);
+        const NOW = new Date();
+
+
+        return await this.excursionRepository.findAll({
+            order: [["createdAt", "desc"]],
+            limit: pagination.limit,
+            offset: pagination.offset,
+            where: {
+                city,
+                date: {
+                    [Op.gt]: NOW
+                },
+            }
+        })
     }
 
     async filterByCoordinates({ path: foreignPath }) {
@@ -39,5 +55,24 @@ export class ExcursionService {
             ]
         }
     }
+
+    private async getPagination(model, userPage, userLimit) {
+        const page = userPage ? parseInt(userPage) : 1;
+        const total = await model.count();
+        const limit = userLimit ? parseInt(userLimit) : parseInt(total);
+        const offset = (page - 1) * limit;
+        const nextPage = total / limit > page ? page + 1 : null;
+        const prevPage = page <= 1 ? null : page - 1;
+        const totalPages = Math.ceil(total / limit);
+        return {
+            limit,
+            offset,
+            nextPage,
+            prevPage,
+            totalRecords: total,
+            totalPages,
+            currentPage: page,
+        };
+    };
 }
 

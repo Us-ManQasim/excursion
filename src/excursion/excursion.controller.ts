@@ -1,5 +1,5 @@
 import {
-    Body, Controller, Get, Param, Post
+    Body, Controller, Get, Param, Post, Query
 } from '@nestjs/common';
 import { ExcursionService } from './excursion.service';
 
@@ -27,18 +27,23 @@ export class ExcursionController {
     // These filters are temporary, to check whether these are working or not?
     // have to create a single path to retrieve data by path & city,
     // Pagination isn't implemented yet.
+
+    @Get('/filter/:city')
+    getByCity(
+        @Param('city') city: string,
+        @Query() query: {
+            currentPage: string,
+            limit: string
+        }
+    ) {
+        return this.excursionService.filterByCity(city, query?.currentPage, query?.limit)
+    }
+
     @Get('/filter/:path')
     filterByPath(
         @Param() params,
     ) {
         return this.excursionService.filterByCoordinates(params);
-    }
-
-    @Get('/filter/:city')
-    getByCity(
-        @Param('city') city: string
-    ) {
-        return this.excursionService.filterByCity({ city })
     }
 
 }

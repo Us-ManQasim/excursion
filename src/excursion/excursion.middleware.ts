@@ -26,7 +26,7 @@ export class AuthorizationMiddleware implements NestMiddleware {
         const decode = <DecodedPayload>this.jwtService.decode(token)
 
         const existingUser = await this.userRepository.findOne({
-            where: { id: decode?.id },
+            where: { id: decode?.id }
         });
         if (!decode || existingUser?.userRole !== 'admin')
             throw new HttpException("Authorization error.", 401)

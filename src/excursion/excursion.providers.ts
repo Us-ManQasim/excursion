@@ -1,4 +1,4 @@
-import { User } from 'src/users/users.model';
+import { User } from 'src/users/users.modal';
 import { EXCURSION_REPOSITORY, USER_REPOSITORY } from '../core/constants';
 import { Excursion } from './excursion.modal';
 

@@ -3,7 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { NextFunction, Request, Response } from "express";
 import { USER_REPOSITORY } from "src/core/constants";
-import { User } from "../users/users.model";
+import { User } from "../users/users.modal";
 
 interface DecodedPayload {
     id: string

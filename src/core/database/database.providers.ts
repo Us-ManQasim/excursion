@@ -2,7 +2,7 @@ import { Sequelize } from 'sequelize-typescript';
 
 import { SEQUELIZE, DEVELOPMENT, TEST, PRODUCTION } from '../constants';
 import { databaseConfig } from './database.config';
-import { User } from '../../users/users.model';
+import { User } from '../../users/users.modal';
 import { Excursion } from 'src/excursion/excursion.modal';
 
 export const databaseProviders = [

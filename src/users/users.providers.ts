@@ -1,4 +1,4 @@
-import { User } from './users.model';
+import { User } from './users.modal';
 import { USER_REPOSITORY } from '../core/constants';
 
 export const usersProviders = [

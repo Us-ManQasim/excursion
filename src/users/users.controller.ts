@@ -1,17 +1,20 @@
 import {
-    Body, Controller, Get, Post
+    Body, Controller, Post, UseGuards
 } from '@nestjs/common';
-import { SignInResponse, UsersService } from './users.service';
+import { DoesUserExist } from 'src/core/guards/doesUserExist.guard';
+import { ISignInResponse } from './interfaces/users.interfaces';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
 
     @Post('/sign-in')
-    signIn(@Body('email') email: string, @Body('password') password: string): Promise<SignInResponse> {
+    signIn(@Body('email') email: string, @Body('password') password: string): Promise<ISignInResponse> {
         return this.usersService.signIn({ email, password });
     }
 
+    @UseGuards(DoesUserExist)
     @Post('/sign-up')
     signUp(
         @Body('name') name: string,
@@ -19,11 +22,5 @@ export class UsersController {
         @Body('password') password: string,
     ) {
         return this.usersService.create({ name, email, password })
-    }
-
-    @Get('/get-users')
-    getAllUsers() {
-        console.log('Congratulations you are authorized person for this job')
-        return this.usersService.getAllUsers()
     }
 }

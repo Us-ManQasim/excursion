@@ -1,5 +1,4 @@
-import { Column, DataType, Default, Model, PrimaryKey, Table } from 'sequelize-typescript';
-import * as _ from "lodash";
+import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 export enum UserRole {
     USER = 'user',

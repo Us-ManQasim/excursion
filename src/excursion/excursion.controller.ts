@@ -28,6 +28,16 @@ export class ExcursionController {
     // have to create a single path to retrieve data by path & city,
     // Pagination isn't implemented yet.
 
+    @Get('/filter')
+    filterByPath(
+        @Query() query: {
+            latitude: number,
+            longitude: number
+        },
+    ) {
+        return this.excursionService.filterByCoordinates(query.latitude, query?.longitude);
+    }
+
     @Get('/filter/:city')
     getByCity(
         @Param('city') city: string,
@@ -39,11 +49,6 @@ export class ExcursionController {
         return this.excursionService.filterByCity(city, query?.currentPage, query?.limit)
     }
 
-    @Get('/filter/:path')
-    filterByPath(
-        @Param() params,
-    ) {
-        return this.excursionService.filterByCoordinates(params);
-    }
+
 
 }

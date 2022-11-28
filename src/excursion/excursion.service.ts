@@ -1,9 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Sequelize } from "sequelize";
+import { json, Sequelize } from "sequelize";
 import { EXCURSION_REPOSITORY } from "src/core/constants";
 import { ExcursionDto } from "./dto/excursion.dto";
 import { Excursion } from "./excursion.modal";
 import { Op } from "sequelize";
+import sequelize from "sequelize";
 
 @Injectable()
 export class ExcursionService {
@@ -38,11 +39,18 @@ export class ExcursionService {
         })
     }
 
-    async filterByCoordinates({ path: foreignPath }) {
-        const path = this.getCoordinates(foreignPath)
-        return await this.excursionRepository.findOne({
-            where: { path }
-        })
+    async filterByCoordinates(longitude, latitude) {
+        return await this.excursionRepository.findAll({
+            where: Sequelize.where(
+                Sequelize.fn('ST_DWithin',
+                    Sequelize.col('path'),
+                    Sequelize.fn('ST_SetSRID',
+                        Sequelize.fn('ST_MakePoint',
+                            longitude, latitude),
+                        4326),
+                    0.8), // Query to find all within 0.016 deg which is approximately 1 mile. 0.8 = 50miles approx
+                true)
+        });
     }
 
     private getCoordinates(path) {

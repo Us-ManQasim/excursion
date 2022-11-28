@@ -7,6 +7,7 @@ import { ExcursionService } from './excursion.service';
 export class ExcursionController {
     constructor(private readonly excursionService: ExcursionService) { }
 
+    // path protected by JWT token
     @Post('/create')
     create(
         @Body('name') name: string,
@@ -18,15 +19,15 @@ export class ExcursionController {
         return this.excursionService.create({ name, date, city, path, description })
     }
 
-
     @Get('/get-all')
-    findAll() {
-        return this.excursionService.findAll();
+    findAll(
+        @Query() query: {
+            offset: number,
+            limit: string
+        }
+    ) {
+        return this.excursionService.findAll(query);
     }
-
-    // These filters are temporary, to check whether these are working or not?
-    // have to create a single path to retrieve data by path & city,
-    // Pagination isn't implemented yet.
 
     @Get('/filter')
     filterByPath(
@@ -35,7 +36,7 @@ export class ExcursionController {
             longitude: number
         },
     ) {
-        return this.excursionService.filterByCoordinates(query.latitude, query?.longitude);
+        return this.excursionService.filterByCoordinates(query.latitude, query.longitude);
     }
 
     @Get('/filter/:city')
@@ -48,7 +49,4 @@ export class ExcursionController {
     ) {
         return this.excursionService.filterByCity(city, query?.currentPage, query?.limit)
     }
-
-
-
 }

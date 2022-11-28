@@ -1,10 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { json, Sequelize } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { EXCURSION_REPOSITORY } from "src/core/constants";
 import { ExcursionDto } from "./dto/excursion.dto";
 import { Excursion } from "./excursion.modal";
-import { Op } from "sequelize";
-import sequelize from "sequelize";
 
 @Injectable()
 export class ExcursionService {
@@ -13,23 +11,31 @@ export class ExcursionService {
     async create(excursion: ExcursionDto) {
         const { name, date, city, path, description } = excursion;
         const point = { type: 'Point', coordinates: path };
-        const response = await this.excursionRepository.create<Excursion>({ name, date, city, path: point, description });
-        return response
+        return await this.excursionRepository.create<Excursion>({ name, date, city, path: point, description });
     }
 
-    async findAll() {
-        return await this.excursionRepository.findAll();
-    }
-
-    async filterByCity(city, userPage, recordLimit) {
-        const pagination = await this.getPagination(this.excursionRepository, userPage, recordLimit);
+    async findAll(query) {
+        const { limit, offset } = await this.getPagination(this.excursionRepository, query.offset, query.limit);
         const NOW = new Date();
-
-
         return await this.excursionRepository.findAll({
             order: [["createdAt", "desc"]],
-            limit: pagination.limit,
-            offset: pagination.offset,
+            limit,
+            offset,
+            where: {
+                date: {
+                    [Op.gte]: NOW
+                },
+            }
+        });
+    }
+
+    async filterByCity(city, _offset, _limit) {
+        const { offset, limit } = await this.getPagination(this.excursionRepository, _offset, _limit);
+        const NOW = new Date();
+        return await this.excursionRepository.findAll({
+            order: [["createdAt", "desc"]],
+            limit,
+            offset,
             where: {
                 city,
                 date: {
@@ -53,33 +59,14 @@ export class ExcursionService {
         });
     }
 
-    private getCoordinates(path) {
-        const response = JSON.parse('{"' + decodeURI(path).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}')
-        return {
-            type: 'Point',
-            coordinates: [
-                parseFloat(response?.latitude),
-                parseFloat(response?.longitude)
-            ]
-        }
-    }
-
-    private async getPagination(model, userPage, userLimit) {
-        const page = userPage ? parseInt(userPage) : 1;
+    private async getPagination(model, _offset, _limit): Promise<{ limit: number, offset: number }> {
+        const page = _offset ? parseInt(_offset) : 1;
         const total = await model.count();
-        const limit = userLimit ? parseInt(userLimit) : parseInt(total);
+        const limit = _limit ? parseInt(_limit) : parseInt(total);
         const offset = (page - 1) * limit;
-        const nextPage = total / limit > page ? page + 1 : null;
-        const prevPage = page <= 1 ? null : page - 1;
-        const totalPages = Math.ceil(total / limit);
         return {
             limit,
             offset,
-            nextPage,
-            prevPage,
-            totalRecords: total,
-            totalPages,
-            currentPage: page,
         };
     };
 }

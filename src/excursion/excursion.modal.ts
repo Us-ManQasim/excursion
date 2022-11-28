@@ -33,7 +33,8 @@ export class Excursion extends Model<Excursion> {
     path: object;
 
     @Column({
-        type: DataType.STRING
+        type: DataType.STRING,
+        allowNull: false,
     })
     description: string
 }

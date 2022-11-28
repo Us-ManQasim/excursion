@@ -12,6 +12,6 @@ import { ExcursionService } from './excursion.service';
 })
 export class ExcursionModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(AuthorizationMiddleware).forRoutes("/excursion")
+        consumer.apply(AuthorizationMiddleware).forRoutes("/excursion/create")
     }
 }
